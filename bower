@@ -1,0 +1,144 @@
+bower is a node js module. install it with npm (another package manager)
+it's a command line utility that manages components that contain html, css, js, fonts, images, etc
+no concatenation or minifying, it just installs the right versions of your packages and their dependencies.
+it hunts down and saves the stuff you need.
+keeps track of these packages in a "manifest file" bower.json
+
+bower is optimized for the frontend. if multiple packages have the same dependency it is only downloaded once. that's called a 'flat dependency graph' and it reduces page load time.
+
+npm install -g bower
+
+recommend install it globally
+
+Bower requires node, npm and git.
+
+install the same way as with npm and homebrew:
+'bower install thing'
+packages go into bower_components and can include github repos or registered packages like jquery.
+
+bower install jquery
+bower install bootstrap
+bower install git://github.com/user/package.git
+
+http://bower.io/search
+
+create your manifest file the same way as with npm:
+'bower init' at root of project
+
+Once you’ve got your bower.json file set u, 'bower install' to install all of the packages you have specified.
+
+{
+  "name": "app-name",
+  "version": "0.0.1",
+  "dependencies": {
+    "sass-bootstrap": "~3.0.0",
+    "modernizr": "~2.6.2",
+    "jquery": "~1.10.2"
+  },
+  "private": true
+}
+
+name – The name of your application/package.
+version – A version number for your application/package.
+dependencies – The packages that are required by your application. You should specify a version number for each of these packages as shown in the example above. Specifying latest, will cause Bower to install the most recent release of a package.
+private – Setting this property to true means that you want the package to remain private and do not wish to add it to the registry in the future.
+
+
+once you've made one, same way you have to use --save or --save-dev
+bower install package --save
+bower install package --save-dev
+bower install unregisteredpackage=githubrepo
+
+Once installed, you can use a package by simply adding a <script> or <link> tag to your HTML markup. Although Bower packages most commonly contain JavaScript files, they can also contain CSS or even images.
+
+<script src="path/to/bower_components/jquery/jquery.min.js"></script>
+<script src="bower_components/jquery/dist/jquery.min.js"></script>
+
+
+ bower list
+list local packages and possible updates
+
+bower prune
+Uninstalls local extraneous packages
+
+bower search <name>
+find a package
+Each result displays the name of the package and a Git endpoint. You will need either the name or Git endpoint to install a package.
+
+bower update <name> <name>
+Updates installed packages to their newest version according to bower.json.
+no arguments means update all
+
+bower uninstall
+uninstall a package locally from your bower_components directory
+
+npm is a node package manager and it creates node_modules folder
+bower creates bower_components folder
+
+http://blog.teamtreehouse.com/getting-started-bower
+
+
+
+Semantic VERSIONING
+installing a package defaults to using the ~ version range operator with latest package
+~1.2.3
+means anything >= 1.2.3-0 and <1.3.0-0
+you can also use fixed package version numbers for sensitive stuff
+bower install jquery #1.10.2
+puts it into bower.json without tilde
+
+you can use a .bowerrc file for customization. for example to set the directory for your where your bower packages go.
+by default goes to bower_components. sometimes you'll see vendor or libs though.
+
+bower list
+shows you all packages, which need updating.
+bower update specificthing
+or all according to versioning in bower.json:
+bower install
+make a new git branch first!
+you can also manually change the version in your bower.json file and then run bower install
+
+cache for offline working
+when you install a package with bower it will cache that locally on your machine.
+bower cache list
+bower cache clean
+
+
+new dev on a project:
+clone from source control
+run
+npm install
+bower install
+grunt or gulp
+from grunt or gulp you could automate this:
+
+pull code from source control
+run grunt
+also use watch to monitor changes and rerun bower install.
+
+
+
+
+install node, npm, bower, gulp
+mkdir myProjectDirectory && cd myProjectDirectory
+bower init (fill in info)
+name, version, description, self explanatory
+main file (can leave blank, pretty sure this is the first one to run?)
+what types of modules does this package expose? globals (?)
+keywords: can leave blank
+authors
+license: MIT
+homepage: blank
+set currently installed components as dependencies? Yes
+add commonly ignored files to ignore list? yes
+mark this package as private? yes (don't want to put your stuff on the registry by accident)
+
+you can always change your bower.json file manually and then run bower update if you need to change versions of things.
+bower list then to check
+
+installing a package that has dependencies:
+bower install will pull dependencies too
+bower install sycamore --save
+
+
+a new developer just runs bower install

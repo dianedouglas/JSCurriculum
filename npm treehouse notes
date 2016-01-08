@@ -1,0 +1,159 @@
+npm is a package manager for js that lets you include other people's code in your project. commonly used for node
+helps you maintain the correct versions too
+install update and uninstall packages without having to manually download and move code into your project.
+packages are bundles of software
+npm packages are mainly js.
+
+*npm packages for node projects are called modules. these two terms are interchangable.
+
+for example: express web framework, or passport the authenticationf ramework.
+npm can be used for dependencies like jquery plugins, with their dependencies like css too.
+npm installs command line tools too like grunt and gulp. These are used to help minify the js and css
+npm also installs compilers or transpilers, or mobile tools like cordova
+or Johnny-Five can control microcontrollers like the arduino. there are even microcontrollers with accompanying frameworks like tessel which run js and work with npm.
+  npm used to stand for node package manager, but now it doesn't stand for anything anymore since it's not just for node
+
+
+
+  Choosing a Package
+Look at npm website.
+There are a number of indicators that you can use to determine which package to use.
+
+Popularity on npm – the number of downloads
+Release Date – the more recent the better
+Number of Releases – the more frequent the better
+Passing Tests - if there's tests passing
+Number of Open Issues – the less the better
+Popularity on GitHub – The more Stars, Forks and Watches the better
+Number of Contributors on GitHub – more eyes on the code the better
+
+http://treehouse.github.io/installation-guides/mac/node-mac.html
+http://treehouse.github.io/installation-guides/windows/node-windows.html
+http://treehouse.github.io/installation-guides/linux/node-linux.html
+
+get npm commmands by typing `npm`
+help = `npm commandname -h`
+
+- get most up to date version of package:
+npm install packagename
+
+compare to 'brew install thing'
+
+if there are any errors it will usually tell you.
+for example bcrypt has a dependency on python between version 2.5 and 3. it says
+"You can pass the --python switch to point to Python >= 2.5 & < 3.0"
+That would look like this. assuming you have a different version of python installed under python2
+npm install bcrypt --python=python2
+
+npm creates a node_modules folder with a folder for bcrypt in it.
+generally you leave this folder alone and let npm deal with it.
+documentation on the npm site, the package's github, or readme.
+generally get example code out of readme.
+
+THEN you need to include the package in your javascript.
+var bcrypt = require('bcrypt');
+no need for paths because of the package.json file inside of bcrypt downloaded folder
+that installed a local package.
+
+installing a global package:
+command line apps/utilities for more than one project can be installed globally
+for ex: the http-server package. lets you start a simple web server on your computer.
+global package = always available for all projects
+npm install packagename -g
+
+permissions issues?
+https://docs.npmjs.com/getting-started/fixing-npm-permissions
+
+can't do ajax in the browser with the file protocol, need server.
+http-server folderyouwantoserve
+
+managing package dependency:
+you can keep track of your packages and their versions without taking up space storing them on github
+use a file called package.json in the root of your project.
+  used to manage all dependencies of your project
+
+after you've installed modules you like, make a package.json file by running:
+  npm init
+walks you through creating the package.json file.
+enter name for package or leave blank for default, any version/description, entry point is the first file to run.
+also can include a 'test command'
+and a git repository
+keywords used for finding your project, you can leave it alone, and then enter author name.
+"MIT" is the standard open source license.
+
+after you've made this file, to save a package as a dependency:
+  npm install packagename --save
+
+remember a .gitignore file for your node_modules folder:
+node_modules/
+
+when you've cloned a repo, install packages in your packages.json file with
+npm install
+no arguments means go look for package.json in root path of folder
+unless a module needs a flag like --python=python2 just add those.
+
+Dev (development) dependencies:
+not needed for the app to run, but used for making the project (test framework)
+reduce the amount of unneeded files in production.
+
+add Mocha as dev dependency:
+ npm install mocha --save-dev
+
+ now we can fill in the 'test' field with the command 'mocha' in our package.json file.
+ then we can get npm to run it for us by using 'npm test'
+ mocha needs a test folder.
+
+ when running 'npm install' by default npm assumes you're in a dev enviornment and installs all the packages including dev.
+ if we want to deploy, we have to tell npm that we want a production environment, which means setting an environment variable.
+ NODE_ENV=production npm install --python=python2
+ type that to get no dev dependencies.
+ environment variables are set on a machine which can influence how an app is run.
+
+ updating packages:
+ version numbers are in package.json. most packages use 'semantic versioning' or 'SemVer' for short
+ 3 numbers separated by .
+ first number is a 'major release' - code with 1.0.0 won't work with 2.0.0
+ second number is a 'minor release' - your code with the prev should still work.
+ add new funcitonality in a non-destructive, backwards compatible way.
+ third digit is for 'patch releases'. bug fixes that don't necessarily break backwards compatibility
+^ before version number means it will install all future versions all the way up to but not including the next major release
+~ before version number instructs npm to install all patch releases until not including the next min release.
+without a ~ or ^ it will install only the specific version you write. good if you specifically need an old version.
+
+find what you need to update:
+npm outdated
+npm outdated -g
+
+
+npm update
+
+if you don't have a package.json file and you run npm update it will update all packages to most recent.
+npm outdated gives no response if everything is up to date.
+update a global package?
+npm update packagename -g
+
+if you don't include the packagename it will update all packages
+no global package.json, so you could get a major release that breaks something.
+
+update npm using npm too :)
+npm update npm -g
+
+ uninstalling packages:
+
+npm uninstall packagename
+npm install makes it install again.
+to remove it from package.json
+npm uninstall packagename --save
+
+remove dev dependency:
+npm uninstall packagename --save-dev
+
+to uninstall global dependency
+npm uninstall packagename -g
+-g single dash, save double dash
+-g is also equal to --global
+
+more?
+command 'npm' by itself lists commands
+'npm help install' for help
+docs.npmjs.com

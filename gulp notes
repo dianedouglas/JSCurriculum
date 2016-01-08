@@ -1,0 +1,339 @@
+gulp notes
+
+dev tool for automating tasks like compiling sass into css or coffeescript to js.
+gulp compiles for us automatically. create smaller files for production environment
+gulp is a javascript task runner
+gulp is an engine that can run individual predefined tasks.
+
+tasks are defined in js files.
+called and run by the gulp engine
+they can run one after the other in a specific order.
+can also be run in parallel if tasks don't depend on each other.
+task setups = pipelines
+
+how to concatenate and minify js
+compile sass into css
+use watch task to detect file changes and trigger other tasks
+break up tasks into a readable file structure
+
+gulpfile.js in root of project
+
+run gulp's dev server by typing:
+
+gulp serve
+
+page automatically refreshes when using gulp serve when you make a change to a file.
+
+run gulp on its own:
+runs another gulp task that is defined.
+this task is the default task
+throws a production ready app in a folder called 'dist'
+
+********
+
+create first gulp task
+
+install node and npm
+https://teamtreehouse.com/library/gulp-basics/welcome-to-gulpjs/installing-gulp
+which node
+which npm
+
+project:
+css/
+fonts/
+img/
+js/
+scss/ (sass)
+.gitignore
+index.html
+license
+readme
+
+loaded all stuff in index.html
+
+you can use node's http-server from the project directory
+(same as in other video.)
+convention to use port 3000. from root directory run:
+http-server -p 3000
+
+git clone
+npm install
+npm init
+npm install gulp --save-dev
+(gulp is not used by the app, so dev only dependency. install globally too. system wide installation will manage local dependencies of gulp in your projects)
+npm install gulp -g
+make 'gulpfile.js' in root directory. can be named other stuff but you need to specify the different name.
+require gulp. name variable after module usually.
+-'use strict' =  node command
+http-server -p 3000
+
+create task!
+use gulp's task method, which takes as first argument the name of the task,
+second arg is an anonymous function that is the task callback.
+run task with command:
+gulp taskname
+
+var gulp = require('gulp');
+gulp.task('thing', function(){
+  //do stuff
+});
+
+name task "default" and it runs without any arguments.
+instead of providing an anoymous function as second parameter provide names of other tasks (other actions to carry out in a particular order)
+array of dependencies. make the hello task a dependency of the default task.
+dependencies get run before the default task if you add another callback function for the default task.
+
+
+3rd party gulp libraries
+gulp plugins are small node packages
+rarely have to build these tasks from scratch.
+
+gulp-concat
+gulp is very commonly used for concatinating files:
+combine multiple files into one file
+great for turning js and css files into just one for optimization
+because a browser can make a request for one file much faster than multiple requests for multiple files.
+
+
+npm for installing
+gulp for running tasks
+npm install gulp-concat --save-dev
+
+in script tag, use one file called 'js/app.js' which will be generated
+<script src="js/app.js"></script>
+then in gulp, require gulp-concat
+var concat = require('gulp-concat');
+make a task with an anonymous callback function
+call gulp.src method with an array of files to concat
+then chain onto that the pipe method to put all that code into one file with specified name.
+then pipe again to specify a folder to save it to using gulp.dest.
+
+gulp.task("concatScripts", function(){
+  gulp.src(['file1.js', 'file2.js']).pipe(concat('finalfile.js')).pipe(gulp.dest('jsfolder'));
+})
+
+run with:
+gulp concatScripts
+
+
+gulp is also commonly used for minifying js files.
+minification is a process that compresses your js file eliminating extra space. sometimes even renames variables to make code more performant.
+first install node package for gulp to use
+- npm install gulp-uglify --save-dev
+- require gulp-uglify
+- gulp.src again to pull in files. this is compressing the concatenated app.js file made by concatScripts. app.js file doesn't exist until the concatScripts file has been run.
+- pipe source to uglify method and then pipe it to gulp.dest to get it written to disk in a particular folder.
+- rename the file when you inify it so that it can still be used in development.
+- npm install gulp-rename --save-dev
+- then call the rename function inside of pipe.
+
+remember to give meaningful names to your required node modules.
+convention is to use name of module.
+when hiphen, use the second word after the hiphen and describe your functionality.
+
+turn sass into css
+sass is compiled into css for the browser
+you can compile it online or in the console, but it's time consuming and distracting.
+also if you forget to compile you won't see changes in the browser
+never edit the compiled file
+application.css gets overwritten everytime you change a sass source file. create task to compile sass to css
+
+install gulp module "gulp-sass", then require it.
+use gulp.src to pull in the master file with import directives pulling in other source files.
+then pipe the sass source to the sass method. no parameters = compile into css
+then pipe the result into a destination folder. both the file and folder get created or overwritten.
+
+Gulp can't compile Sass using built in methods.
+
+
+
+
+
+source maps in sass/js
+
+modular small files easier to maintain and keep track of and organize, especially for large teams.
+in browser the only style info you see is the compiled one. but what if you need to figure out which sass file to change to change a particular compiled style?
+source maps. tell you in the browser inspector which sass file each style comes from. click on the link and you are taken to it.
+without source maps it just takes you to 'application.css' compiled file.
+
+gulp-sourcemaps
+npm install gulp-sourcemaps --save-dev
+var maps = require('gulp-sourcemaps');
+then add the mapping init function to the compileSass task.
+after it pulls in the source, gulp should make the map,
+compile it, then call write method to set the directory relative to the root directory where you want the compiled files to live, save that compilation in the folder css
+
+
+  gulp.src("scss/application.scss")
+     .pipe(maps.init())
+     .pipe(sass())
+     .pipe(maps.write('./'))
+     .pipe(gulp.dest('css'));
+
+
+run with same command gulp compileSass
+same plugin we use for sass source maps works for js too.
+without, suppose you have to track down an undefined variable in your js. you'll get an error pointing
+directly to the compressed/minified file on line 10,000 and that doesnt help.
+
+take pipe of source files and run maps.init
+.pipe(maps.init())
+after gulp.src pulls in all the files.
+
+gulp.src([
+  'js/jquery',
+  'js/sticky/jquery.sticky.js',
+  'js/main.js'])
+.pipe(maps.init())
+.pipe(concat('app.js'))
+.pipe(maps.write('./'))
+.pipe(gulp.dest('js'));
+
+
+multiple tasks
+create build task with dependency tasks in an array as strings.
+gulp normally runs all tasks concurrently, not serially but in parallel. out of order! you could end up one step behind minifying the previously created file.
+to run serially add dependencies to individual tasks and a return statement to tasks that are depended upon so that the next task knows when it has finished.
+
+say that one task uses a file created by a prev one.
+called taskFirst and taskNext.
+in taskNext, include taskFirst as dependency, then in taskFirst use a return statement.
+gulp.task("taskNext", ["taskFirst"], function(){
+  //stuff
+})
+gulp.task("taskFirst", function(){
+  return "the stream created here.";"
+}); //like a promise
+then you can make build a dependency of the default task and all you have to do is type gulp.
+many websites use the default gulp task to build their site for production. makes it easy for a new dev to jump right into the project.
+GULP TASKS DEFINED AS DEPENDENCIES DO NOT RUN IN THE ORDER THEY ARE DEFINED. BUT THEY DO RUN BEFORE THE MAIN TASK WHICH DEPENDS ON THEM.
+
+watch method
+gulps built in watch method watches files for changes and then runs tasks.
+write code and save files, you just work and gulp does everything else.
+//watch method
+gulp.task('watchSass', function(){
+  //no need for return since other tasks don't depend on this one.
+  //no need for require since watch is built into gulp.
+  //first param is names of files to watch.
+  //need to remember to include subfiles. for ex: dont watch the compiled application.css, watch all sass files and the sass files they import.
+  //you can use a globbing pattern to list a bunch of files, or an array including paths.
+  gulp.watch('scss/**/*.scss', ['compileSass']);
+  //look in scss folder, all its subdirectories, find all files with a scss extension.
+  //don't forget to wrap tasks to trigger in an array even if only one. if not using a globbing pattern then remember to put those in an array too.
+  //you can use multiple globbing patterns in an array too just like multiple file names.
+  //now if we change any sass file compileSass will automatically be run. you'll see it in the terminal.
+})
+saves you seconds that add up, and also saves you from forgetting to run important tasks.
+
+gulp lets you automate your dev workflow, also build and deploy your app.
+
+
+build process - compile/optimize all app files so that they are ready to move to a production env on a server.e
+
+- gulp lets you:
+work with components of your frontend app,
+build and deploy your app,
+and automate your workflow and development environment
+
+- during your build process you must compile and optimize all files so they are ready to move to a production environment on a web server.
+
+build and deploy:
+deployment of app: get those files onto the server
+build  process: file concatenation, minification etc for optimization
+
+build pipeline will update the files that have been changed on your server as you develop.
+pipe all our production files into a folder called dist.  do this by adding a gulp task.
+
+gulpfile.js:
+
+gulp.task("build", ['minifyScripts', 'compileSass'], function(){
+`  return gulp.src(["css/application.css", "js/app.min.js", "index.html", "img/**", "fonts/**"], {base: './'}).pipe(gulp.dest('dist'));
+`  });
+
+base property is the the base path. paths to source files are relative to base.
+without this parameter the directory structure is not preserved and all files get chucked into the dist folder.
+gulp.dest('dist') means put all the files into a folder called 'dist'
+
+to run the task type 'gulp build'
+need base option to preserve directory structure in the new dist build folder
+
+clean task deletes previous build files. must clean if file names have been changed.
+clean task makes sure that nothing stays from past builds.
+
+install node module with 'npm install name --save-dev'
+npm = package manager
+then require the new module with gulp.
+
+del module lets you delete folders from tasks.
+npm install del --save-dev
+var del = require('del');
+
+gulp.task('clean', function() {
+  del('dist');
+})
+
+
+when we run the clean task, call the 'del' module with the name of the folder to delete.
+delete more stuff using globbing patterns (*) or an array of files.
+
+del(['dist', css/application.css*, 'app*.js*']);
+
+finally, replace the default task dependencies with clean and use the body of the task callback to call the build task using the built in gulp 'start' method.
+
+gulp.task('default', ['clean'], function(){
+  gulp.start('build'); //runs after the clean task dependency has finished.
+});
+
+you have to be in the root of the project directory to run gulp. not 1 level up if you cloned without the "."
+
+For development:
+run watchSass to have the gulp watch method keep track of your files and compile them for you when they change.
+but you must have the server started in your top level project directory.
+
+//////////EXPERIMENT
+if you want to work with the production build, start your server in the dist directory inside of your project directory.
+then you have to run the build task to see the changes because they get copied into that dist folder.
+
+you can automate the whole build with watch instead of just compiling the sass if you want, but that could get slow for a large app.
+  then you would keep your server in dist and:
+
+gulp.task('full', ['clean'], function(){
+  gulp.start('build'); //runs after the clean task dependency has finished.
+});
+
+gulp.task('watchSass', function(){
+  gulp.watch('scss/**/*.scss', ['full']);//try running the full clean/build automatitically as you develop.
+});
+but here's a better way to do it:
+
+
+***********
+implement a development task pipeline for our app
+-we want gulp to watch our js and sass files and recompile them when they change.
+so we use more than one "watch" block where the first argument is an array of one or more files to watch, and an array of dependencies to run if any of them change.
+gulp.watch(['file1.css, 'stuff.*s.css'], ['compileCss']);
+gulp.watch(['scripts.js', 'js/**'], ['concatJs']);
+remember dependencies are run concurrently unless there is only one specified and it specifies dependencies, and if it has a return statement in it.
+you don't need to minify the scripts because that's only for performance reasons and it is only needed in a production env.
+only need to concat your js.
+
+run your server from top level of your project directory
+run your 'watchFiles' task in a different tab
+for some reason he has a blank task called 'serve' who runs the 'watchFiles' task as a dependency.
+
+all you have to do as you develop is save your files and refresh browser.
+then when it's ready, run the longer clean/build task to run all the tasks including minify, as well as update the dist folder with all your assets if any of them have changed.
+
+******
+https://github.com/hdngr/advanced-gulp-example
+bower components
+angular app
+e2e = tests
+
+in a larger app, you have a gulpfile.js in root directory, and a whole 'gulp' folder with other gulp tasks in separate .js files.
+when you are figuring out a large gulp configuration, work from the bottom of the file up.
+the order of tasks apparently matters.
+look at the final task and then look at its dependencies which are run in parallel. then their dependencies.
+
+you can pass in an options array from the master gulpfile to smaller gulp files - this is where people store the name of the distribution folder, etc.

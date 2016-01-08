@@ -1,0 +1,131 @@
+- Make sure npm and node installed
+
+- Make project file hierarchy:
+
+mkdir project
+cd project/
+mkdir js test
+touch js/scripts.js test/specs.js
+
+- Create package.json file for npm
+npm init
+name: (project) hello
+version: (1.0.0)
+description:
+entry point: (index.js)
+test command: mocha
+git repository:
+keywords:
+author:
+license: (ISC)
+About to write to /Users/diane/project/package.json:
+
+{
+  "name": "hello",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "directories": {
+    "test": "test"
+  },
+  "scripts": {
+    "test": "mocha"
+  },
+  "author": "",
+  "license": "ISC"
+}
+
+
+Is this ok? (yes) yes
+
+- Install mocha testing framework and chai assertion library as dev dependencies
+
+npm install mocha --save-dev
+npm install chai --save-dev
+
+* Note: when running 'npm install' by default npm assumes you're in a dev enviornment and installs all the packages including dev.
+if we want to deploy, we have to tell npm that we want a production environment, which means setting an environment variable.
+NODE_ENV=production npm install
+
+- Run tests:
+npm test
+
+- Example specs.js test file:
+
+
+var expect = require('chai').expect;
+var app = require("./../js/scripts.js");
+
+describe('functionality', function() {
+  it("returns something we want", function() {
+    expect(app.functionToTest("input")).to.equal("output");
+  });
+});
+
+
+
+- Example scripts.js file to test:
+
+
+exports.functionToTest = function(thing) {
+  return "output";
+};
+
+
+
+Adding a development pipeline with gulp
+
+install gulp:
+gulp is not used by the app, so dev only dependency.
+install globally too.
+system wide installation will manage local dependencies of gulp in your projects
+
+npm install gulp -g
+npm install gulp --save-dev
+
+install a dev server. must be installed globally.
+npm install http-server -g
+
+make 'gulpfile.js' in root directory:
+
+/////////////////////////////////////
+'use strict'
+var gulp = require('gulp');
+
+gulp.task('taskName', function(){
+  console.log('testing!');
+});
+/////////////////////////////////////
+
+run the gulp task with:
+gulp taskName
+
+now lets make a task to run our tests
+first install and require the gulp-mocha package
+
+npm install --save-dev gulp-mocha
+var mocha = require('gulp-mocha');
+
+Then we write a task to run our tests:
+
+gulp.task('runTests', function(){
+	return gulp.src('test/specs.js', {read: false})
+		.pipe(mocha({reporter: 'nyan'}));
+});
+
+Then we write a task to run that task whenever relevant files change.
+
+gulp.task('watchJs', function(){
+  gulp.watch(['js/*.js', 'test/specs.js'], ['runTests']);
+});
+
+Good to leave this separate so that things are organized into one job per task and other dependencies can be added as needed to either task.
+if you add more files to watch, add them to the watch task.
+If there's another task that needs to happen before the tests are run, add it as a dependency to the runTests function.
+Don't use default task for the watchTask because there might be other default tasks that you want to run.
+
+Finally, assign the watchJs task to be in the default task dependencies.
+Here you could add other default tasks, such as watching the sass files to recompile them when one of them is changed.
+But you wouldn't want to squish this in with the tasks used for running the tests automatically when you change your js, because that is a totally different piece of functionality, and a different action that is required.
+
+gulp.task('default', ['watchJs']);
