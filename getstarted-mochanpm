@@ -71,8 +71,10 @@ exports.functionToTest = function(thing) {
   return "output";
 };
 
+Good article on what 'exports' means, vs 'module.exports'
+http://www.hacksparrow.com/node-js-exports-vs-module-exports.html
 
-
+*****************************
 Adding a development pipeline with gulp
 
 install gulp:
@@ -129,3 +131,24 @@ Here you could add other default tasks, such as watching the sass files to recom
 But you wouldn't want to squish this in with the tasks used for running the tests automatically when you change your js, because that is a totally different piece of functionality, and a different action that is required.
 
 gulp.task('default', ['watchJs']);
+****************************
+
+Add packages with bower: jquery, bootstrap, moment.js
+install globally:
+npm install -g bower
+
+bower init
+
+name, description, main file, keywords, authors, license (default MIT), homepage, optional.
+select 'globals' under 'what type of modules does this package expose?'
+select 'Y' under 'set currently installed components as dependencies?'
+select 'Y' under 'add commonly ignored files to ignore list?'
+select 'Y' under 'would you like to mark this package as private which prevents it from being accidentally published to the registry?'
+select 'Y' under 'Looks good?'
+
+
+bower install jquery
+bower install bootstrap
+
+if you put jquery into your script file with 'exports' in it, then you get errors in the browser about 'exports' being undefined.
+because the browser is loading it instead of the node environment.
