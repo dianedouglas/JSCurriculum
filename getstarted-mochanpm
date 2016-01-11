@@ -152,3 +152,7 @@ bower install bootstrap
 
 if you put jquery into your script file with 'exports' in it, then you get errors in the browser about 'exports' being undefined.
 because the browser is loading it instead of the node environment.
+
+file concat task.
+npm install gulp-concat --save-dev
+npm install gulp-uglify --save-dev

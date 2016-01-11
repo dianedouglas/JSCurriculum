@@ -1,0 +1,36 @@
+week 1: building an asset pipeline
+
+filesystem watching
+file concatenation
+development server
+building flat files for production
+dependency management with bower
+running tests on the command line
+using jquery, mocha, chai, etc - all existing tools
+json
+
+week 2: client-side mvc with angular 2
+
+
+
+
+
+goal 1: build a web page that has a button you can click to see 'hello world'
+
+* use bower for jquery
+* use gulp to build it from bower and your own js file
+
+goal 2: add bootstrap
+
+goal 3: make a development server:
+http-server
+
+goal 4: write some logic-y thing and write a test with mocha and chai that can be run from the command line
+
+https://teamtreehouse.com/library/npm-basics
+https://teamtreehouse.com/library/gulp-basics
+https://scotch.io/tutorials/scraping-the-web-with-node-js
+https://gearside.com/public-json-feeds/
+https://www.publicapis.com
+http://developer.rottentomatoes.com/docs/read/JSON
+http://openweathermap.org/api
