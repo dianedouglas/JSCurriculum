@@ -1,0 +1,306 @@
+-Download Node.js (nodejs.org)
+Node.js installation has 2 parts: node executable and hpm executable
+You can call it in the command line with 'node filename.js'
+It interprets the node.js code within the sourcefile filename.js and executes it, then returns back to the command line.
+
+
+.js source files can contain either client-side js or serverside node.js code.
+**THEY BOTH USE THE JS LANGUAGE BUT THEY HAVE NOTHING ELSE IN COMMON.
+client-side js needs to be run by the browser
+server-side Node.js code is run by the node executable
+you can split up js code into two folders 'client' and 'server'
+
+//////////////////////////////////////////////////////////////////
+Hello world:
+file: project/hello.js
+
+```
+console.log('hello world');
+```
+
+Run it with:
+node hello.js
+
+It runs the code and prints hello world to the command line.
+//////////////////////////////////////////////////////////////////
+
+Node will run your server for you. Here is some code which will listen for web requests on a particular port (1337) and regardless of the request respond with a basic page displaying 'hello world'.
+
+var httpModule = require('http');
+httpModule.createServer(function (req, res) {
+ res.writeHead(200, {'Content-Type': 'text/plain'});
+ res.end('Hello World!\n');
+}).listen(1337, '127.0.0.1');
+console.log('Server running at http://127.0.0.1:1337/');
+
+Save this in a file called 'hellosvr.js' and run it with 'node hellosvr.js'. Then in your browser go to the address http://127.0.0.1:1337. You'll get 'hello world' printed on your screen. If you go to /index, or /whatever, this will also print 'hello world' because regardless of the request we are responding to it with the same page.
+
+The code above uses the core node module 'http'. We are loading it into our file using the 'require' function. We can save ourselves this whole step by using a node module to run the server for us: 'http-server'. This is where npm comes in.
+
+Npm lets us download node modules that are not built into the node.js executable. A node module is a collection of data and functions bundled together to add functionality to your project. A package is a node module that can be added to the node executable and is not included by default. Package and Module mean the same thing.
+
+////////////////////////////////////////////////////////////////
+
+Namespaces
+
+Each module has a namespace. A namespace is used to access the functions contained in a module, and keep them separate from functions that might have the same name in a different module. There might be 2 modules which both have a 'save' function. However, they were written by different developers and they have different purposes. We can keep them separate because both save functions reside in different namespaces.
+A namespace is essentially a variable holding a javascript object. The functions defined in that module are properties of that module's namespace object.
+
+For example, we used the built in module 'http' above. We assigned it to the namespace 'httpModule' by using the 'require' function. the require function has one argument - the name of the source file holding the module code. This is sometimes shortened to the name of the module name, such as the 'http' module in the example above loaded with `require('http')`. Require loads the source file for the module and returns an object that is assigned to the httpModule variable. This namespace variable could be named anything, it is the path we use to call functions contained in the http module. If we had a module named 'cool-module' we could load it with:
+
+var myNameIsBob = require('cool-module.js');
+
+If we had a function inside of our module called 'sayHello' then we would call it using our namespace variable like this:
+
+myNameIsBob.sayHello();
+
+///////////////////////////////////////////////////////////////
+
+A static node server serves up files as static web pages.
+There's a module called node-static we can use for that.
+
+//load modules
+var http = require('http');
+var static = require('node-static');
+
+//use the .Server() method on our variable 'static' which comes from the module 'node-static'.
+var file = new static.Server();
+
+//Then we can call its 'serve' method inside of our 'createServer' function callback, passing in the request and response.
+
+http.createServer(function (req, res) {
+ file.serve(req, res);
+}).listen(1337, '127.0.0.1');
+console.log('Server running at http://127.0.0.1:1337/');
+
+node development: create js source files that contain Node.js code. use npm to install packages. then we can use the require function to load the package and use its functions in our code. Finally, the node executable is run on the .js node files and they are executed.
+
+////////////////////////////////////////////////////////////
+DEBUGGING
+A web application is, at its heart, a series of URL requests.
+http calls are routed to specific node.js code that makes the page function.
+when you have an error in your code it will exit with a 'stack trace'.
+
+- The top of the stack trace shows the code that threw the error (not necessarily the cause, but that is the code which created and threw an error object)
+- Then there is an error message to giv eyou a hint.
+- Then the remainder is called the 'call stack' it is a series of function calls which led to the error.
+- Listed from innermost to outermost. Meaning that we have functions which call other functions, which call other functions, and those inner ones called last are listed first because they are the deepest and most recent.
+- In each line the call stack shows first the name of the function (for example "at NameSpace.functionName") and then it lists the name of the file that contains the function, followed by the last line which was executed. This line would either call the next function or in the case of the top function in the call stack, it throws the error object.
+
+////////////////////////////////////////////////////////////////////
+In PHP, a PHP file represents an HTML page. A web server, such as Apache, accepts
+requests and if a PHP page is requested, the web server runs the PHP. But in Node.js,
+the main Node.js file represents the entire web server. It does not run inside a web server
+like Apache; it replaces Apache. So, some bootstrap Node.js code is needed to make the
+web server work.
+You can do this yourself with the included node module 'http' or you can use npm to download an external   module for your server like 'http-servere' or 'node-static'. This node code, run by the executable is your server and it handles requests made to your web app's urls.
+
+GENERAL TERMS
+built-in modules v external modules (installed with NPM, not part of node.js executable)
+////////////////////////////////////////////////////////////////////////////////
+
+var file = new static.Server();
+
+module object is named static.
+Inside there is a key (property) named Server and its value is a constructor function.
+constructor functions are meant to be used with the 'new' keyword.
+A Server object is returned and stored in the file variable.
+
+It's like saying
+$file = new Server();
+this would call the constructor of the Server class. The only difference here is that it's namespaced to static.Server().
+
+In Node.js, functions can be assigned to variables, just like strings and numbers. When a
+function is assigned to a variable, the function itself is called a callback, and for our
+convenience, the variable that it is assigned to is called a callback variable. A callback
+variable is defined nearly the same as a regular function is defined, except that a callback
+can be unnamed and is preceded by a variable assignment
+
+////////////////////////////////////////////////////////////////////////////////
+
+NODE BEST PRACTICES
+http://justbuildsomething.com/node-js-best-practices/
+node is powerful because of its non-blocking io and asynchronous runtime.
+1. always use asynchronous methods.
+
+var data = fs.readFileSync('/path/to/file');
+console.log(data);
+
+This code stops the entire runtime until the reading is complete.  No other code can be run until that method is done.
+
+Instead, if you do this:
+
+fs.readFile('/path/to/file', function (err, data) {
+    // err will be an error object if an error occured
+    // data will be the file that was read
+    console.log(data);
+});
+
+Using an asynchronous method above means the data gets read and calls the callback function when it's finished providing the data and any error messages that exist. In the meantime, while the file is being read, other code can continue to run.
+
+2. Never require modules inside of functions. require is always run synchronously. This is so that modules can load in other modules that it requires. Loading modules is meant to be an expensive process that only happens once when your app loads. Then the modules are cached so they aren't required again.
+
+If you had a module that was really big, this could pause your app, for all users by tying up the server until it was finished loading.
+
+Also, if the module causes an error and it isn't loaded until a particular function is called by the route handler then you might not know about the error until it's already in production.
+
+Always require your modules at the top of your file outside any functions.
+
+var _ = require('underscore');
+
+function myFunction(someArray){
+
+    // use underscore without the need
+    // to require it again
+    _.sort(someArray, function(item){
+        // do something with item
+    });
+
+}
+
+module.exports.myFunction = myFunction;
+
+3. THIS
+
+this variable changes depending on context. It refers to the OBJECT THAT INVOKED THE FUNCTION.
+
+function MyClass() {
+    this.myMethod = function() {
+        console.log(this);
+    };
+}
+
+var myClass = new MyClass();
+myClass.myMethod(); // this resolves as the instance of MyClass
+
+var someFunction = myClass.myMethod;
+someFunction(); // this resolves as the window in a browser and the global object in Node
+The object calling a function rather than calling a method on an object is the "god" object(global object), or the window in a browser.
+
+you can prevent this error by preserving 'this' in another variable like 'self'
+
+function MyClass() {
+    var self = this;
+    this.myMethod = function() {
+        console.log(self);
+    };
+}
+
+var myClass = new MyClass();
+myClass.myMethod(); // self resolves as the instance of MyClass
+
+var someFunction = myClass.myMethod;
+someFunction(); // self also resolves as the instance of MyClass
+
+4. always 'use strict' at the beginning of your js files.
+5.  Node.js uses a lot of callbacks. also weakly typed - allows any variable to be converted to other data types. but only functions are callable. this creates a common problem where if you pass a string to a function as an argument and it needs a callback function instead then your app will crash trying to execute the string.
+
+THIS MIGHT NOT A GOOD BEGINNER SOLUTION. YOU WANT TO KNOW IT IF YOU ARE CALLING YOUR CALLBACK FUNCTIONS WRONG.
+(typeof callback === 'function') ? callback : function() {};
+
+This determines if the callback is a function. If it’s not a function for any reason it creates an empty function and sets the callback to be that function. This way all callbacks are callable and optional.
+
+Place that line at the top of each function that receives a callback and you will never crash due to uncallable callbacks again.
+
+5. when writing your own modules they will need callback functions passed in. if an error occurs don't throw an exception because that could shut down the whole node server. instead create an error object and pass it to the callback function named by the user as the first parameter. callback function is what to do at the completion of the module function's task. it is defined by the user as the next step in an operation.
+
+for example if we call a module function:
+
+var myModule = require('myModule');
+
+var specification = 'do thing 1';
+
+myModule.myFunction(specification, thing2);
+
+var thing2 = function(){
+  //do the next set of things here.
+}
+
+
+that module function might be defined this way inside of myModule.js and it is expecting an array, not a string.
+
+function myFunction(parameter, callback){
+
+    // an example of an error that could occur
+    // if the passed in object is
+    // not the right data type
+    if( !Array.isArray(someArray) ){
+        var err = new TypeError('someArray must be an array');
+        callback(err, null);
+        return;
+    }
+
+    // ... do other stuff
+
+    callback(null, someData);
+
+}
+
+module.export.myFunction = myFunction;
+
+Check for errors, then the module should do its work, then the module should call the user's specified callback to show it is finished. Is a callback always at the end? Can you call it multiple times from your module, perhaps in a loop? In any case, pass the error object back first. if no error occurred, pass null.
+
+6. The other half of the previous practice is that you always check for errors in callbacks. detect errors when they happen before you try to use data returned by a module that is incomplete or corrupted from some error. For example, if your database query giver you an error you want to check for that before trying to use the database results.
+
+myAsyncFunction({
+        some: 'data'
+    }, function(err, someReturnedData) {
+
+        if(err){
+            // don't use someReturnedData
+            // it's not populated
+            return;
+        }
+
+        // do something with someReturnedData
+        // we know there was no error
+
+    }
+});
+
+7.  functions that are not Node.js specific that come from JS can still throw an error which could crash your server. like JSON.parse. detect this with try/catch
+
+var parsedJSON;
+
+try {
+    parsedJSON = JSON.parse('some invalid JSON');
+} catch (err) {
+    // do something with your error
+}
+
+if (parsedJSON) {
+    // use parsedJSON
+}
+
+8. module.exports, not 'exports'
+
+exports is a helper method that collects properties and attaches them to module.exports.
+but exports only does it if module.exports doesn't already have existing properties. if it does then everything attached to exports is ignored.
+
+
+9. coding standards
+Node.js follows a standard for writing code that varies slightly from the standards that govern writing browser based JavaScript.
+
+This standard is called CommonJS. http://wiki.commonjs.org/wiki/CommonJS
+- it mandates certain file organization and behavior that should be expected from the CommonJS module loader (require).
+- It also describes how internals of the Node.js system should work.
+
+10. extras
+-jsdoc
+-process manager like upstart or forever
+
+avoid 'callback hell'
+
+
+******************
+sample project. where to put everything?
+http://www.codemag.com/article/1407041
+
+server-side dependencies, browser dependencies, and development dependencies.
+server-side dependencies are installed via npm and run by node. They refer to libraries that run on a remote server that you deploy, rather than running in the Web browser.
+browser dependencies, clientside, run by browser.
+both server-side and client-side dependencies are implemented in the same language.
+Development dependencies are libraries used during the process of writing code but that won’t run in the production environment.
+
+READ LATER
+https://devcenter.heroku.com/articles/node-best-practices
