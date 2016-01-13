@@ -304,3 +304,8 @@ Development dependencies are libraries used during the process of writing code b
 
 READ LATER
 https://devcenter.heroku.com/articles/node-best-practices
+
+CLIENT V SERVER
+client is responsible for rendering pages, making them interactive, making requests to the server
+server is responsible for serving up pages and processing data from requests 
+http://programmers.stackexchange.com/questions/171203/what-are-the-differences-between-server-side-and-client-side-programming
