@@ -1,0 +1,235 @@
+A 'component' manages a view = a piece of the web page where we display info to the user
+It's a class that controls a view template.
+keep app code in the /app folder.
+it follows this pattern:
+
+app.AppComponent =
+  ng.core.Component({
+  })
+  .Class({
+  });
+
+  ************************************************************************
+
+(function(app) {
+  app.AppComponent =
+    ng.core.Component({
+      selector: 'my-app',
+      template: '<h1>My First Angular 2 App</h1>'
+    })
+    .Class({
+      constructor: function() {}
+    });
+})(window.app || (window.app = {}));
+
+  ************************************************************************
+
+`Component` method takes an object as an argument with 2 properties:
+
+- selector: the name of the tag where you are attaching the view for this component
+- template: the template to use for the view. (string with html or a file)
+
+`Class` method is where you implement the component's properties and methods that bind to the view and its behavior for this part of the UI.
+
+***********************
+
+We are creating a single global namespace for our application called `app` and we are adding all code to this one global artifact. We avoid putting stuff in the global namespace by wrapping the code in an IIFE (immediately invoked function expression)
+
+
+(function(app) {
+  //stuff!!!
+})(window.app || (window.app = {}));
+
+Because we are saying
+
+function(app){}
+
+inside of this:
+
+()();
+
+We are basically defining the function and then immediately calling it afterwards and passing in an argument.an anonymous function that is executed right after it's created.
+Since we call methods/functions by putting (); after the name of the function, this is the same thing, except that the function doesn't need a name. It's just run immediately.
+
+for example, it is shorthand for this
+
+var f = function () {
+  //stuff!!!
+};
+f();
+
+As our argument we are passing in the global namespace object, if it exists, and if it doesn't we set it to an empty object (rather than undefined.)
+
+*****************
+
+Most of our app files export one thing by adding that thing to the app namespace.
+line 1 of our app.component.js file exports AppComponent:
+
+app.AppComponent = ...
+
+(function(app) {
+  app.AppComponent =
+    ng.core.Component({
+      selector: 'my-app',
+      template: '<h1>My First Angular 2 App</h1>'
+    })
+    .Class({
+      constructor: function() {}
+    });
+})(window.app || (window.app = {}));
+
+
+We are setting this property AppComponent on the app object equal to the result of calling the angular core method 'Component' - a constructor for a component.
+
+app.AppComponent =
+  ng.core.Component({})
+
+And we are passing in an object with our selector/template properties to the Component method. Then we call the Class method on the result of that (the returned component object) and this defines its behavior.
+By adding the property AppComponent onto the app object we are adding a new branch to the tree.
+The next file that runs with the IIFE will see that now window.app is not undefined, so it will not be reset to a blank object, and it will instead be passed in so that we can add more functions to it, like adding rooms to a house.
+
+
+****************************************************
+Modules and components
+You can also have child components that descend from AppComponent as well as more files and modules.
+Quickstart app has one component and modules are a fundamental organizational role. They rely on other modules.
+when we need something provided by another module in our app we get it from the app object. when another object needs to use our AppComponent, it gets it from the app.AppComponent.
+
+ng.platform.browser.bootstrap(app.AppComponent);
+
+angular is also a collection of library modules and when we need something from it we use the `ng` object
+
+***************************************************
+
+
+ng.core.Component() tells Angular that this class definition object is an Angular component.
+
+selector = CSS selector for a host HTML element. in example 'my-app' is used without '#' or '.' because it is in the html as a tag.
+
+<my-app> </my-app>
+
+Angular creates and displays an instance of our AppComponent wherever it encounters a my-app element in the host HTML.
+
+The template property holds the component's companion template. A template is a form of HTML that tells Angular how to render a view.
+
+***************************************************
+
+Now we need to boot our app up. Add boot.js to the app folder.
+
+(function(app) {
+  document.addEventListener('DOMContentLoaded', function() {
+    ng.platform.browser.bootstrap(app.AppComponent);
+  });
+})(window.app || (window.app = {}));
+
+- wrapped in the same IIFE we have some vanilla js for attaching an event handler:
+
+document.addEventListener('DOMContentLoaded', function() {});
+
+- which is basically document ready in jquery.
+
+so when the dom is loaded, we call an angular method 'bootstrap' and we pass it in the names of our components.
+
+    ng.platform.browser.bootstrap(app.AppComponent);
+
+our AppComponent is the `root component type`
+
+***************************************************
+
+index.html
+
+load libs and then our modules. note that boot.js won't work if app.component.js isn't loaded first.
+<html>
+
+  <head>
+    <title>Angular 2 QuickStart</title>
+
+    <!-- 1. Load libraries -->
+    <script src="node_modules/angular2/bundles/angular2-polyfills.js"></script>
+    <script src="node_modules/rxjs/bundles/Rx.umd.js"></script>
+    <script src="node_modules/angular2/bundles/angular2-all.umd.js"></script>
+
+    <!-- 2. Load our 'modules' -->
+    <script src='app/app.component.js'></script>
+    <script src='app/boot.js'></script>
+
+  </head>
+
+  <!-- 3. Display the application -->
+  <body>
+    <my-app>Loading...</my-app>
+  </body>
+
+</html>
+
+remember to do 3 things in index.html:
+
+* script tags for node_modules
+* script tags for our components followed by boot.js
+* include tags for templates to be attached to in the html.
+
+Angular calls the bootstrap function it reads the AppComponent metadata, finds the selector and matches it to an element in the html, then loads the app between those tags.
+
+Start your app with:
+
+npm start
+
+runs static server called 'lite-server' (node module) which loads index.html in a browser and refreshes the browser when the app files change.
+
+********************************
+
+Why keep boot.js in a separate file?
+It's a separate concern from the components. **a component's job is to manage a view.** launching the app has nothing to do with view management.
+It means you can test your components with unit tests without bootstrapping the whole app. As soon as we load the component file to test the component, the bootstrap function tries to load the application in the browser. It throws an error because we're not expecting to run the entire application, just test the component.
+More reusable because now we can refactor/rename.
+
+
+
+
+
+
+//////////////////////////////////////////////////////////////////////////////
+
+
+The Component is the most fundamental of Angular concepts. A component manages a view - a piece of the web page where we display information to the user and respond to user feedback. Technically, a component is a class that controls a view template.
+
+app/app.component.ts:
+
+```
+import {Component} from 'angular2/core';
+
+@Component({
+    selector: 'my-app',
+    template: '<h1>My First Angular 2 App</h1>'
+})
+export class AppComponent {
+  //FUNCTIONALITY HERE
+}
+```
+
+Angular apps are modular. They consist of many files each dedicated to a purpose.
+
+Most application files export one thing such as a component. Our app.component file exports the AppComponent with the line at the bottom of our component file:
+
+export class AppComponent { };
+
+exporting something with the keyword 'export' turns the file into a module.
+name of file without extension is usually the name of the module: `app.component`
+You could also have child components descended from appcomponent.
+
+for a module to use another module we import it.
+
+import {AppComponent} from './app.component';
+
+A class becomes a component when we give it metadata.  this lets angular know how to construct the view and make it work in the app.
+
+define the metadata with the angular Component function. we access the function by importing it from the angular library at the top of our component file.
+
+import {Component} from 'angular2/core';
+
+Then we apply the function to our class as what is called a 'decorator' by using the @ symbol. It is invoked above the component class. Tells angular that this class is a special angular component. We pass it an object as an argument with configuration settings in it 'selector' and 'template'
+
+selector is a css selector for where to render the view
+template is the html and data to put into the rendered view.
+
+The root component (referred to as the app component above) loads the initial template for the application that will load other components to perform whatever functions your application needs - menu bars, views, forms, etc. We'll walk through examples of all of these in the following pages.
