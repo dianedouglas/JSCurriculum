@@ -97,10 +97,10 @@ var gulp = require('gulp');
 gulp.task('taskName', function(){
   console.log('testing!');
 });
-/////////////////////////////////////
 
 run the gulp task with:
 gulp taskName
+/////////////////////////////////////
 
 now lets make a task to run our tests
 first install and require the gulp-mocha package
@@ -114,7 +114,7 @@ gulp.task('runTests', function(){
 	return gulp.src('test/specs.js', {read: false})
 		.pipe(mocha({reporter: 'nyan'}));
 });
-
+////////////////////////////////////
 Then we write a task to run that task whenever relevant files change.
 
 gulp.task('watchJs', function(){
@@ -147,8 +147,8 @@ select 'Y' under 'would you like to mark this package as private which prevents 
 select 'Y' under 'Looks good?'
 
 
-bower install jquery
-bower install bootstrap
+bower install jquery --save
+bower install bootstrap --save
 
 if you put jquery into your script file with 'exports' in it, then you get errors in the browser about 'exports' being undefined.
 because the browser is loading it instead of the node environment.
